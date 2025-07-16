@@ -13,11 +13,3 @@ A Typst template for Bachelor and Master theses at the University of Basel.
   // ... see documentation for all parameters
 )
 ```
-
-## Example:
-
-To get started, use the following `starter` repository which contains a usage example as well as detailed explanations on features. Visit: https://github.com/Nifalu/dmi-thesis-starter or
-
-```
-git clone git@github.com:Nifalu/dmi-thesis-starter.git
-```
