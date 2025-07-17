@@ -1,4 +1,4 @@
-#import "@preview/dmi-thesis:0.1.0": *
+#import "@preview/dmi-basilea-thesis:0.1.0": *
 // or for local testing:
 // #import "../src/main.typ": *  // This is for local testing
 
@@ -17,6 +17,7 @@
   thesis-type: "Bachelor Thesis",
   date: datetime.today(),
   language: "en",
+  body-font: "Helvetica",
 
   abstract: [
     This is a demonstration / tutorial on the usage of the UniBasel Typst template.
