@@ -48,6 +48,36 @@ This is the main function to setup a thesis
   sans-font: default-fonts.sans,
   mono-font: default-fonts.mono,
 
+  // Font sizes - individual parameters
+  body-size: 11pt,
+  mono-size: 11pt,
+  footnote-size: 9pt,
+  header-size: 9pt,
+
+  // Heading sizes - individual parameters
+  chapter-number-size: 100pt,
+  chapter-title-size: 24pt,
+  section-size: 14pt,
+  subsection-size: 12pt,
+  subsubsection-size: 12pt,
+
+  // Font weights - new parameters
+  chapter-number-weight: "bold",
+  chapter-title-weight: "bold",
+  section-weight: "bold",
+  subsection-weight: "bold",
+  subsubsection-weight: "bold",
+
+  // Custom text styling functions - optional overrides
+  // These allow complete control over text styling if provided
+  body-text-style: none,           // Custom function for body text
+  mono-text-style: none,           // Custom function for mono/code text
+  chapter-number-style: none,      // Custom function for chapter numbers
+  chapter-title-style: none,       // Custom function for chapter titles
+  section-style: none,             // Custom function for sections
+  subsection-style: none,          // Custom function for subsections
+  subsubsection-style: none,       // Custom function for subsubsections
+
   logo: auto, // options: auto | none | path | image-element
   logo-width: 4.5cm,
 
@@ -82,7 +112,7 @@ This is the main function to setup a thesis
 
          // Only show header if not on a chapter page
          if not on-chapter-page {
-           set text(size: 9pt, font: body-font, fill: gray)
+           set text(size: header-size, font: body-font, fill: gray)
 
            // Get current chapter name
            let headings = query(heading.where(level: 1).before(here()))
@@ -107,18 +137,27 @@ This is the main function to setup a thesis
      footer: []  // Empty footer as in LaTeX
    )
 
-  // Typography - matching LaTeX \setlength and font definitions
+  // Typography - apply default settings first
   set text(
-    font: body-font,  // Main text font
-    size: 10pt,
+    font: body-font,
+    size: body-size,
     lang: language
   )
 
   show raw: set text(
     font: mono-font,
-    size: 10pt,
+    size: mono-size,
     lang: language
   )
+
+  // Apply custom styling if provided (this will override the defaults)
+  if body-text-style != none {
+    show: body-text-style
+  }
+
+  if mono-text-style != none {
+    show raw: mono-text-style
+  }
 
   // Paragraph settings - matching LaTeX
   set par(
@@ -133,16 +172,22 @@ This is the main function to setup a thesis
     gap: 0.65em,
   )
 
-  // Heading numbering
+  show footnote.entry: it => {
+    set text(size: footnote-size)
+    it
+  }
+
+  // Heading numbering - only up to level 3 (subsection)
   set heading(numbering: (..nums) => {
     let level = nums.pos().len()
     if level == 1 {
       // Chapter: no dot
       numbering("1", ..nums)
-    } else {
+    } else if level <= 3 {
       // Sections and subsections: with dots
       numbering("1.", ..nums)
     }
+    // Level 4 and deeper: no numbering (returns none implicitly)
   })
 
   // Equation numbering
@@ -157,62 +202,83 @@ This is the main function to setup a thesis
       #grid(
         columns: 1,
         rows: (auto, auto),
-        row-gutter: 20pt,  // midchapskip
-        align: right,  // Ensure grid content is right-aligned
+        row-gutter: 20pt,
+        align: right,
 
         // Chapter number
         if it.numbering != none [
-          #text(
-            size: 100pt,
-            font: sans-font,
-            weight: "bold",
-            fill: rgb(179, 179, 179),  // 0.7 gray
-            counter(heading).display()
-          )
+          #if chapter-number-style != none {
+            chapter-number-style(counter(heading).display())
+          } else {
+            text(
+              size: chapter-number-size,
+              font: sans-font,
+              weight: chapter-number-weight,
+              fill: rgb(179, 179, 179),
+              counter(heading).display()
+            )
+          }
         ],
 
         // Chapter title
-        text(
-          size: 24pt,
-          font: sans-font,
-          weight: "bold",
-          it.body
-        )
+        if chapter-title-style != none {
+          chapter-title-style(it.body)
+        } else {
+          text(
+            size: chapter-title-size,
+            font: sans-font,
+            weight: chapter-title-weight,
+            it.body
+          )
+        }
       )
     ]
 
-    v(30pt)  // Space after chapter title
+    v(30pt)
   }
 
   // Section styles with widow/orphan control
   show heading.where(level: 2): it => {
-    v(25pt, weak: true)  // beforesubsecskip
-    block(breakable: false, below: 2em)[
-      #text(size: 14pt, font: sans-font, weight: "bold")[
-        #counter(heading).display() #it.body
-      ]
-      #v(1pt, weak: true)  // aftersubsecskip
+    v(35pt, weak: true)  // Space before section
+    block(breakable: false)[
+      #if section-style != none {
+        section-style(counter(heading).display() + " " + it.body)
+      } else {
+        text(size: section-size, font: sans-font, weight: section-weight)[
+          #counter(heading).display() #it.body
+        ]
+      }
     ]
+    v(20pt, weak: true)  // Space after section - matching paragraph spacing
   }
 
   show heading.where(level: 3): it => {
-    v(20pt, weak: true)
-    block(breakable: false, below: 2em)[
-      #text(size: 11pt, font: sans-font, weight: "bold")[
-        #counter(heading).display() #it.body
-      ]
-      #v(1pt, weak: true)  // Add spacing after level 3 headings
+    v(25pt, weak: true)  // Space before subsection
+    block(breakable: false)[
+      #if subsection-style != none {
+        subsection-style(counter(heading).display() + " " + it.body)
+      } else {
+        text(size: subsection-size, font: sans-font, weight: subsection-weight)[
+          #counter(heading).display() #it.body
+        ]
+      }
     ]
+    v(16pt, weak: true)  // Space after subsection
   }
 
+  // Level 4 and deeper - no numbering
   show heading.where(level: 4): it => {
-    v(15pt, weak: true)
-    block(breakable: false, below: 2em)[
-      #text(size: 11pt, font: sans-font, weight: "bold")[
-        #counter(heading).display() #it.body
-      ]
-      #v(1pt, weak: true)  // Add spacing after level 4 headings too
+    v(20pt, weak: true)  // Space before subsubsection
+    block(breakable: false)[
+      #if subsubsection-style != none {
+        subsubsection-style(it.body)
+      } else {
+        text(size: subsubsection-size, font: sans-font, weight: subsubsection-weight)[
+          #it.body  // No numbering for level 4+
+        ]
+      }
     ]
+    v(16pt, weak: true)  // Space after subsubsection
   }
 
   // Title page - matching LaTeX layout
@@ -352,10 +418,11 @@ This is the main function to setup a thesis
       if level == 1 {
         // Appendix chapters: no dot
         numbering("A", ..nums)
-      } else {
+      } else if level <= 3 {
         // Appendix sections and subsections: with dots
         numbering("A.1", ..nums)
       }
+      // Level 4 and deeper: no numbering
     })
     counter(heading).update(0)
 
