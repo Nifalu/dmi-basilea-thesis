@@ -189,70 +189,71 @@ This is the main function to setup a thesis
   // Equation numbering
   set math.equation(numbering: "1.")
 
-  // Chapter style - large gray number as in LaTeX
-  show heading.where(level: 1): it => {
-    pagebreak(weak: true)
-    v(50pt)
+  show heading: it => {
+    // Chapter style - large gray number as in LaTeX
+    if it.level == 1 {
+      pagebreak(weak: true)
+      v(50pt)
 
-    align(right)[
-      #grid(
-        columns: 1,
-        rows: (auto, auto),
-        row-gutter: 20pt,
-        align: right,
+      align(right)[
+        #grid(
+          columns: 1,
+          rows: (auto, auto),
+          row-gutter: 20pt,
+          align: right,
 
-        // Chapter number
-        if it.numbering != none [
-          #if chapter-number-style != none {
-            chapter-number-style(counter(heading).display())
+          // Chapter number
+          if it.numbering != none [
+            #if chapter-number-style != none {
+              chapter-number-style(counter(heading).display())
+            } else {
+              text(
+                size: chapter-number-size,
+                font: sans-font,
+                weight: chapter-number-weight,
+                fill: rgb(179, 179, 179),
+                counter(heading).display()
+              )
+            }
+          ],
+
+          // Chapter title
+          if chapter-title-style != none {
+            chapter-title-style(it.body)
           } else {
             text(
-              size: chapter-number-size,
+              size: chapter-title-size,
               font: sans-font,
-              weight: chapter-number-weight,
-              fill: rgb(179, 179, 179),
-              counter(heading).display()
+              weight: chapter-title-weight,
+              it.body
             )
           }
-        ],
-
-        // Chapter title
-        if chapter-title-style != none {
-          chapter-title-style(it.body)
-        } else {
-          text(
-            size: chapter-title-size,
-            font: sans-font,
-            weight: chapter-title-weight,
-            it.body
-          )
-        }
-      )
-    ]
-
-    v(30pt)
-  }
-
-  show heading: it => {
-    let index = it.level - 2
-    let section
-    if sections.len() >= index {
-      section = default-section
+        )
+      ]
+      v(30pt)
     } else {
-      section = sections.at(index)
-    }
-
-    v(section.space_before, weak:true)
-    block(breakable: false)[
-      #if section.style != none {
-        section.style(counter(heading).display() + " " + it.body)
+      // Section style
+      let index = it.level - 2
+      let section
+      if sections.len() >= index {
+        section = default-section
       } else {
-        text(size: section.size, font: sans-font, weight: section.weight)[
-          #counter(heading).display() #it.body
-        ]
+        section = sections.at(index)
       }
-    ]
-    v(section.space_after, weak: true)  // Space after section - matching paragraph spacing
+
+      v(section.space_before, weak:true)
+      block(breakable: false)[
+        #if section.style != none {
+          section.style(counter(heading).display() + " " + it.body)
+        } else {
+          text(size: section.size, font: sans-font, weight: section.weight)[
+            #counter(heading).display() #it.body
+          ]
+        }
+      ]
+      v(section.space_after, weak: true)  // Space after section - matching paragraph spacing
+
+    }
   }
 
   // Title page - matching LaTeX layout
