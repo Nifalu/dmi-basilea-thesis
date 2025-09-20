@@ -17,7 +17,7 @@ and Computer Science, built with [Typst](https://typst.app).
 ### Using the Typst Package
 
 ```typst
-#import "@preview/dmi-basilea-thesis:0.1.1": *
+#import "@preview/dmi-basilea-thesis:0.1.2": *
 
 #show: thesis.with(
   title: "Your Thesis Title",

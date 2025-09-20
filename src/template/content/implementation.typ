@@ -1,7 +1,7 @@
-#import "@preview/dmi-basilea-thesis:0.1.0": *
+#import "@preview/dmi-basilea-thesis:0.1.2": *
 
 // Or for local development
-// #import "../../src/main.typ": *
+// #import "../../main.typ": *
 
 = Implementation <implementation>
 

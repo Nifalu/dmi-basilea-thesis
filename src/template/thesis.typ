@@ -1,6 +1,6 @@
-#import "@preview/dmi-basilea-thesis:0.1.1": *
+#import "@preview/dmi-basilea-thesis:0.1.2": *
 // or for local testing:
-// #import "../src/main.typ": *  // This is for local testing
+// #import "../main.typ": *  // This is for local testing
 
 #show: thesis.with(
   draft: true,

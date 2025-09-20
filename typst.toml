@@ -1,6 +1,6 @@
 [package]
 name = "dmi-basilea-thesis"
-version = "0.1.1"
+version = "0.1.2"
 entrypoint = "src/main.typ"
 authors = ["Nico Bachmann <typst@nifalu.ch>"]
 license = "MIT"
@@ -11,6 +11,6 @@ disciplines = ["computer-science"]
 repository = "https://github.com/Nifalu/dmi-basilea-thesis"
 
 [template]
-path = "template"
+path = "src/template"
 entrypoint = "thesis.typ"
 thumbnail = "src/assets/thumbnail.png"
