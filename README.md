@@ -1,6 +1,7 @@
 # DMI Basel Thesis Template for Typst
 
-A modern thesis template for the University of Basel, Department of Mathematics and Computer Science, built with [Typst](https://typst.app).
+A modern thesis template for the University of Basel, Department of Mathematics
+and Computer Science, built with [Typst](https://typst.app).
 
 ## Features
 
@@ -63,29 +64,42 @@ A modern thesis template for the University of Basel, Department of Mathematics 
 ### Optional Typography Control
 
 #### Font Families
+
 - `body-font`: Main text font (default: "Times New Roman")
 - `sans-font`: Headings font (default: "Arial")
 - `mono-font`: Code font (default: "Courier New")
 
 #### Font Sizes
+
 - `body-size`: Main text size (default: 10pt)
 - `mono-size`: Code text size (default: 10pt)
 - `footnote-size`: Footnote size (default: 9pt)
 - `header-size`: Page header size (default: 9pt)
 
 #### Heading Sizes
+
 - `chapter-number-size`: Chapter number size (default: 100pt)
 - `chapter-title-size`: Chapter title size (default: 24pt)
-- `section-size`: Section heading size (default: 14pt)
-- `subsection-size`: Subsection size (default: 11pt)
-- `subsubsection-size`: Subsubsection size (default: 11pt)
 
 #### Font Weights
+
 - `chapter-number-weight`: Weight for chapter numbers (default: "bold")
 - `chapter-title-weight`: Weight for chapter titles (default: "bold")
-- `section-weight`: Section heading weight (default: "bold")
-- `subsection-weight`: Subsection weight (default: "bold")
-- `subsubsection-weight`: Subsubsection weight (default: "bold")
+
+#### Sections
+
+- `sections`: This is an array where each object defines the styling for a
+  specific subsection level. The array index corresponds to the subsection level
+  (e.g., index 0 for level 1, index 1 for level 2, and so on). Each object
+  within the array contains the following properties:
+  - `size`: The font size of the section
+  - `weight`: The font weight
+  - `space-before`: The spacing before the section start
+  - `space-after`: The spacing after the section title
+  - `style`: A custom styling function for the section
+- `default-section`: This is a single dictionary that defines the default
+  styling for any heading level not explicitly included in the sections array.
+  It contains the same properties as the dictionaries within the sections array.
 
 ### Advanced Styling
 
@@ -109,13 +123,11 @@ For complete control, you can provide custom styling functions:
 ```
 
 Available style functions:
+
 - `body-text-style`: Override body text styling
 - `mono-text-style`: Override code text styling
 - `chapter-number-style`: Override chapter number styling
 - `chapter-title-style`: Override chapter title styling
-- `section-style`: Override section styling
-- `subsection-style`: Override subsection styling
-- `subsubsection-style`: Override subsubsection styling
 
 ### Compilation Modes
 
@@ -155,4 +167,5 @@ Available style functions:
 
 ## Contributing
 
-Contributions are welcome! Please open an issue or submit a pull request on [GitHub](https://github.com/Nifalu/dmi-basilea-thesis).
+Contributions are welcome! Please open an issue or submit a pull request on
+[GitHub](https://github.com/Nifalu/dmi-basilea-thesis).

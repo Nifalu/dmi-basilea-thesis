@@ -17,12 +17,16 @@ Re-export functionality to be accessible via the public API
 #let important = important
 #let definition = definition
 #let theorem = theorem
+#let default-sections = (
+    (size: 14pt, weight: "bold", space_before: 35pt, space_after: 20pt, style: none), // section
+    (size: 12pt, weight: "bold", space_before: 25pt, space_after: 16pt, style: none), // subsection
+    (size: 12pt, weight: "bold", space_before: 20pt, space_after: 16pt, style: none)  // subsubsection
+)
 
 #let ie = ie
 #let eg = eg
 #let cf = cf
 #let etal = etal
-
 
 /*
 This is the main function to setup a thesis
@@ -57,16 +61,13 @@ This is the main function to setup a thesis
   // Heading sizes - individual parameters
   chapter-number-size: 100pt,
   chapter-title-size: 24pt,
-  section-size: 14pt,
-  subsection-size: 12pt,
-  subsubsection-size: 12pt,
+
+  sections: default-sections, // make default a variable, such that individual entries of array can be modified
+  default-section: (size: 12pt, weight: "bold", space_before: 20pt, space_after: 16pt,  style: none),
 
   // Font weights - new parameters
   chapter-number-weight: "bold",
   chapter-title-weight: "bold",
-  section-weight: "bold",
-  subsection-weight: "bold",
-  subsubsection-weight: "bold",
 
   // Custom text styling functions - optional overrides
   // These allow complete control over text styling if provided
@@ -74,9 +75,6 @@ This is the main function to setup a thesis
   mono-text-style: none,           // Custom function for mono/code text
   chapter-number-style: none,      // Custom function for chapter numbers
   chapter-title-style: none,       // Custom function for chapter titles
-  section-style: none,             // Custom function for sections
-  subsection-style: none,          // Custom function for subsections
-  subsubsection-style: none,       // Custom function for subsubsections
 
   logo: auto, // options: auto | none | path | image-element
   logo-width: 4.5cm,
@@ -177,108 +175,85 @@ This is the main function to setup a thesis
     it
   }
 
-  // Heading numbering - only up to level 3 (subsection)
   set heading(numbering: (..nums) => {
     let level = nums.pos().len()
     if level == 1 {
       // Chapter: no dot
       numbering("1", ..nums)
-    } else if level <= 3 {
+    } else  {
       // Sections and subsections: with dots
       numbering("1.", ..nums)
     }
-    // Level 4 and deeper: no numbering (returns none implicitly)
   })
 
   // Equation numbering
   set math.equation(numbering: "1.")
 
-  // Chapter style - large gray number as in LaTeX
-  show heading.where(level: 1): it => {
-    pagebreak(weak: true)
-    v(50pt)
+  show heading: it => {
+    // Chapter style - large gray number as in LaTeX
+    if it.level == 1 {
+      pagebreak(weak: true)
+      v(50pt)
 
-    align(right)[
-      #grid(
-        columns: 1,
-        rows: (auto, auto),
-        row-gutter: 20pt,
-        align: right,
+      align(right)[
+        #grid(
+          columns: 1,
+          rows: (auto, auto),
+          row-gutter: 20pt,
+          align: right,
 
-        // Chapter number
-        if it.numbering != none [
-          #if chapter-number-style != none {
-            chapter-number-style(counter(heading).display())
+          // Chapter number
+          if it.numbering != none [
+            #if chapter-number-style != none {
+              chapter-number-style(counter(heading).display())
+            } else {
+              text(
+                size: chapter-number-size,
+                font: sans-font,
+                weight: chapter-number-weight,
+                fill: rgb(179, 179, 179),
+                counter(heading).display()
+              )
+            }
+          ],
+
+          // Chapter title
+          if chapter-title-style != none {
+            chapter-title-style(it.body)
           } else {
             text(
-              size: chapter-number-size,
+              size: chapter-title-size,
               font: sans-font,
-              weight: chapter-number-weight,
-              fill: rgb(179, 179, 179),
-              counter(heading).display()
+              weight: chapter-title-weight,
+              it.body
             )
           }
-        ],
+        )
+      ]
+      v(30pt)
+    } else {
+      // Section style
+      let index = it.level - 2
+      let section
+      if sections.len() >= index {
+        section = default-section
+      } else {
+        section = sections.at(index)
+      }
 
-        // Chapter title
-        if chapter-title-style != none {
-          chapter-title-style(it.body)
+      v(section.space_before, weak:true)
+      block(breakable: false)[
+        #if section.style != none {
+          section.style(counter(heading).display() + " " + it.body)
         } else {
-          text(
-            size: chapter-title-size,
-            font: sans-font,
-            weight: chapter-title-weight,
-            it.body
-          )
+          text(size: section.size, font: sans-font, weight: section.weight)[
+            #counter(heading).display() #it.body
+          ]
         }
-      )
-    ]
+      ]
+      v(section.space_after, weak: true)  // Space after section - matching paragraph spacing
 
-    v(30pt)
-  }
-
-  // Section styles with widow/orphan control
-  show heading.where(level: 2): it => {
-    v(35pt, weak: true)  // Space before section
-    block(breakable: false)[
-      #if section-style != none {
-        section-style(counter(heading).display() + " " + it.body)
-      } else {
-        text(size: section-size, font: sans-font, weight: section-weight)[
-          #counter(heading).display() #it.body
-        ]
-      }
-    ]
-    v(20pt, weak: true)  // Space after section - matching paragraph spacing
-  }
-
-  show heading.where(level: 3): it => {
-    v(25pt, weak: true)  // Space before subsection
-    block(breakable: false)[
-      #if subsection-style != none {
-        subsection-style(counter(heading).display() + " " + it.body)
-      } else {
-        text(size: subsection-size, font: sans-font, weight: subsection-weight)[
-          #counter(heading).display() #it.body
-        ]
-      }
-    ]
-    v(16pt, weak: true)  // Space after subsection
-  }
-
-  // Level 4 and deeper - no numbering
-  show heading.where(level: 4): it => {
-    v(20pt, weak: true)  // Space before subsubsection
-    block(breakable: false)[
-      #if subsubsection-style != none {
-        subsubsection-style(it.body)
-      } else {
-        text(size: subsubsection-size, font: sans-font, weight: subsubsection-weight)[
-          #it.body  // No numbering for level 4+
-        ]
-      }
-    ]
-    v(16pt, weak: true)  // Space after subsubsection
+    }
   }
 
   // Title page - matching LaTeX layout
@@ -390,7 +365,7 @@ This is the main function to setup a thesis
     #if language == "en" [Table of Contents] else [Inhaltsverzeichnis]
   ]
 
-  outline(depth: 3, indent: auto, title: none)
+  outline(indent: auto, title: none)
 
   // Main content chapters
   pagebreak()
