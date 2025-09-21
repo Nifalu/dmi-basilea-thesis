@@ -13,12 +13,12 @@ doc:
   typst compile --input theme=dark docs/thumbnail.typ thumbnail-dark.svg --ppi 144 --pages 1
 
 # run test suite
-# test *args:
-#   tt run {{ args }}
+test *args:
+  tt run {{ args }}
 
 # update test cases
-# update *args:
-#   tt update {{ args }}
+update *args:
+  tt update {{ args }}
 
 # package the library into the specified destination folder
 package target:
@@ -41,4 +41,4 @@ uninstall: (remove "@local")
 uninstall-preview: (remove "@preview")
 
 # run ci suite
-ci: doc
+ci: test doc
